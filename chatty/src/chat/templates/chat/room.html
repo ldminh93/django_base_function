@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chatty</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<style>
+    @keyframes bounce {
+        0% {
+            transform: matrix3d(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        4.7% {
+            transform: matrix3d(0.45, 0, 0, 0, 0, 0.45, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        9.41% {
+            transform: matrix3d(0.883, 0, 0, 0, 0, 0.883, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        14.11% {
+            transform: matrix3d(1.141, 0, 0, 0, 0, 1.141, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        18.72% {
+            transform: matrix3d(1.212, 0, 0, 0, 0, 1.212, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        24.32% {
+            transform: matrix3d(1.151, 0, 0, 0, 0, 1.151, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        29.93% {
+            transform: matrix3d(1.048, 0, 0, 0, 0, 1.048, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        35.54% {
+            transform: matrix3d(0.979, 0, 0, 0, 0, 0.979, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        41.04% {
+            transform: matrix3d(0.961, 0, 0, 0, 0, 0.961, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        52.15% {
+            transform: matrix3d(0.991, 0, 0, 0, 0, 0.991, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        63.26% {
+            transform: matrix3d(1.007, 0, 0, 0, 0, 1.007, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        85.49% {
+            transform: matrix3d(0.999, 0, 0, 0, 0, 0.999, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+        100% {
+            transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        }
+    }
+
+    .friend {
+        display: flex;
+        justify-content: end;
+        position: relative;
+    {#animation: fadeIn 1s ease-in;#}
+    }
+
+    .friend span {
+        background: #4ac1f7;
+    {#padding: 10px;#} clear: both;
+        padding: 6px 10px 7px;
+        border-radius: 10px 10px 0px 10px;
+        background: rgba(0, 0, 0, 0.3);
+        margin: 8px 0;
+        font-size: 11px;
+        line-height: 1.4;
+        margin-left: 35px;
+        position: relative;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+    }
+
+    .friend span:before {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        border-top: 6px solid rgba(0, 0, 0, .3);
+        right: 0;
+        border-left: 7px solid transparent;
+    }
+
+    .me {
+        display: flex;
+    {#animation: fadeIn 1s ease-in;#}
+    }
+
+    .me span {
+        background: #4ac1f7;
+    {#padding: 10px;#} clear: both;
+        padding: 6px 10px 7px;
+        border-radius: 10px 10px 10px 0;
+        background: rgba(184, 35, 22, 0.3);
+        margin: 8px 0;
+        font-size: 11px;
+        line-height: 1.4;
+        margin-left: 35px;
+        position: relative;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, .2);
+    {#animation: fadeIn 1s ease-in;#}
+    }
+
+    .me span:before {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        border-top: 6px solid rgba(184, 35, 22, 0.3);
+        left: 0;
+        border-right: 7px solid transparent;
+    }
+
+    .new {
+        transform: scale(1);
+        transform-origin: 0 0;
+        -webkit-animation: bounce 500ms linear both;
+        animation: bounce 500ms linear both;
+        box-sizing: border-box;
+    }
+</style>
+<body>
+<form action="javascript:sendMessage();">
+<section class="section">
+    <div class="container">
+        <div class="columns is-multiline">
+            <div class="column is-6 is-offset-3 mb-6">
+                <section class="hero is-primary">
+                    <div class="hero-body">
+                        <p class="title">
+                            Chatty
+                        </p>
+                        <p class="subtitle">
+                            A simple chat built with Django, Channels and Redis
+                        </p>
+                    </div>
+                </section>
+            </div>
+
+            <div class="column is-6 is-offset-3">
+                <div class="box">
+                    <div id="chat-messages" style="max-height: 300px; overflow-y: scroll;">
+                        {% for m in messages %}
+                            {% if m.username == username %}
+                                <div class="communication me">
+                                    <span><b>{{ m.username }}</b>: {{ m.content }}<br></span>
+                                </div>
+                            {% else %}
+                                <div class="communication friend">
+                                    <span style="float: right"><b>{{ m.username }}</b>: {{ m.content }}<br></span>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input class="input" type="text" placeholder="Message" id="chat-message-input">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+
+                            <button class="button is-info" id="chat-message-submit">Submit</button>
+
+                    </div>
+                </div>
+
+                <small class="has-text-grey-light">Your username: {{ username }}</small>
+            </div>
+        </div>
+    </div>
+</section>
+</form>
+{{ room_name|json_script:"json-roomname" }}
+{{ username|json_script:"json-username" }}
+
+<script>
+
+    function scrollToBottom() {
+        let objDiv = document.getElementById("chat-messages");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
+
+    scrollToBottom();
+
+    const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
+    const userName = JSON.parse(document.getElementById('json-username').textContent);
+
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/'
+        + roomName
+        + '/'
+    );
+
+    chatSocket.onmessage = function (e) {
+        console.log('onmessage');
+        $('.communication').removeClass('new')
+        const data = JSON.parse(e.data);
+        var message = ''
+        if (data.message) {
+            if (data.username == '{{ username }}') {
+                message = ('<div class="communication me new"><span><b>' + data.username + '</b>: ' + data.message + '<br></span></div')
+            } else {
+                message = ('<div class="communication friend new"><span><b>' + data.username + '</b>: ' + data.message + '<br></span></div')
+            }
+            document.querySelector('#chat-messages').innerHTML += message;
+        } else {
+            alert('The message is empty!');
+        }
+
+        scrollToBottom();
+    };
+
+    chatSocket.onclose = function (e) {
+        console.log('The socket close unexpectadly');
+    };
+
+    function sendMessage() {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'username': userName,
+            'room': roomName
+        }));
+
+        messageInputDom.value = '';
+    }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+</body>
+</html>
