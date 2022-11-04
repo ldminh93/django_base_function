@@ -22,6 +22,7 @@ RUN pip install -U pip \
 RUN pip3 install social-auth-app-django
 
 COPY . ./
+COPY ../../src/requirements.txt requirement.txt
 RUN pip install -r requirements.txt
 
 #ENTRYPOINT ["sh", "migrate_index.sh"]

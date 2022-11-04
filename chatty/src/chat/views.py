@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication, TokenAuthentication
 
 from rest_framework.decorators import action
@@ -42,24 +43,29 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 def index(request):
+    if not request.user.is_authenticated:
+        return redirect(signin)
     return render(request, 'chat/index.html')
 
 
 def signin(request):
     if request.user.is_authenticated:
-        return redirect('')
+        return redirect(index)
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request=request, user=user)
-            return render(request, 'chat/index.html')
-    return render(request, 'registration/login.html')
+            return redirect(index)
+    return render(request, 'auth/login.html')
 
-# def logout(request):
-
-
+def signout(request):
+    if not request.user.is_authenticated:
+        return redirect(signin)
+    else:
+        logout(request=request)
+        return redirect(signin)
 def room(request, room_name):
     username = request.GET.get('username', 'Anonymous')
     messages = Message.objects.filter(room=room_name).order_by('-id')[0:25]

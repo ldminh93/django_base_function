@@ -7,8 +7,8 @@ services:
       && python manage.py migrate
       && echo yes | python manage.py collectstatic
       && python manage.py runserver 0.0.0.0:8000"
-#    volumes:
-#      - '../chatty:/var/www/html/'
+    volumes:
+      - '../src:/var/www/html/'
     networks:
       - es-net
     ports:

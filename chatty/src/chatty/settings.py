@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     # pip install elasticsearch==7.14.0
     # pip install elasticsearch-dsl==7.4.0
     # pip install django-elasticsearch-dsl==7.2.0
-    'django_elasticsearch_dsl'
+    'django_elasticsearch_dsl',
+    'fontawesomefree'
 ]
 
 AUTH_USER_MODEL = 'blog.CustomUser'
@@ -100,8 +101,8 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            # 'hosts': [('redis', 6379)],
-            'hosts': [('localhost', 6379)],
+            'hosts': [('redis', 6379)],
+            # 'hosts': [('localhost', 6379)],
         }
     }
 }

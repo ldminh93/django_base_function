@@ -39,6 +39,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 {
                     'type': 'chat_message',
+                    'action': action,
                     'message': message,
                     'username': username
                 }
@@ -73,9 +74,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         message = event['message']
         username = event['username']
+        action = event['action']
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
+            'action': action,
             'message': message,
             'username': username
         }))
