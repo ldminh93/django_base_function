@@ -10,10 +10,7 @@ from . import consumers
 urlpatterns = [
     path('home/', views.index, name='index'),
     path('home/<str:room_name>/', views.room, name='room'),
+    path('login/', views.signin, name='room'),
+    # path("accounts/", include("django.contrib.auth.urls")),
 
-
-    # path('test/', RefreshToken.as_view(), name='test'),
-    # path('test/<str:pk>/', MessageDetail.as_view(), name='message-detail')
-    # path('test/', include(router.urls)),
-    # path('', include(router.urls)),
 ]

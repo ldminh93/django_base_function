@@ -118,64 +118,151 @@
         animation: bounce 500ms linear both;
         box-sizing: border-box;
     }
+
+    .box {
+        position: relative;
+        padding-bottom: 45px !important;
+    }
+    p{
+        margin: 0;
+    }
+    .show_typing{
+        display: flex !important;
+    }
+    .typing {
+        display: none;
+        background-color: #b8a2f4;
+        padding: 2px;
+        {#width: 15%;#}
+        height: 35px;
+        border: 1px solid #c3acff;
+        border-radius: 12px;
+        box-shadow: 10px 10px 20px rgba(43, 21, 149, 0.63);
+        position: absolute;
+        margin: auto;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    .typing span {
+        content: '';
+        display: block;
+        height: 3px;
+        width: 3px;
+        border-radius: 50px;
+        background-color: #401a77;
+        box-shadow: 5px 5px 5px #1e0660 inset;
+
+        animation: indicator 0.6s infinite;
+        animation-timing-function: ease-in-out;
+        animation-direction: alternate;
+        animation-delay: 0s;
+        padding: 4px;
+        margin: 2px
+    }
+
+    .typing span:nth-child(2) {
+        animation-delay: 0.25s;
+    }
+
+    .typing span:last-child {
+        animation-delay: 0.5s;
+    }
+
+    @keyframes indicator {
+        0% {
+            margin-bottom: 1.5px;
+        }
+
+        25% {
+            margin-bottom: 2.5px;
+        }
+
+        50% {
+            margin-bottom: 3.5px;
+        }
+
+        75% {
+            margin-bottom: 4.5px;
+        }
+
+        100% {
+            margin-bottom: 5px;
+        }
+    }
 </style>
 <body>
-<form action="javascript:sendMessage();">
-<section class="section">
-    <div class="container">
-        <div class="columns is-multiline">
-            <div class="column is-6 is-offset-3 mb-6">
-                <section class="hero is-primary">
-                    <div class="hero-body">
-                        <p class="title">
-                            Chatty
-                        </p>
-                        <p class="subtitle">
-                            A simple chat built with Django, Channels and Redis
-                        </p>
-                    </div>
-                </section>
-            </div>
-
-            <div class="column is-6 is-offset-3">
-                <div class="box">
-                    <div id="chat-messages" style="max-height: 300px; overflow-y: scroll;">
-                        {% for m in messages %}
-                            {% if m.username == username %}
-                                <div class="communication me">
-                                    <span><b>{{ m.username }}</b>: {{ m.content }}<br></span>
-                                </div>
-                            {% else %}
-                                <div class="communication friend">
-                                    <span style="float: right"><b>{{ m.username }}</b>: {{ m.content }}<br></span>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
+{% if user.is_authenticated %}
+  <form action="javascript:sendMessage();">
+    <section class="section">
+        <div class="container">
+            <div class="columns is-multiline">
+                <div class="column is-6 is-offset-3 mb-6">
+                    <section class="hero is-primary">
+                        <div class="hero-body">
+                            <p class="title">
+                                Chatty
+                            </p>
+                            <p class="subtitle">
+                                A simple chat built with Django, Channels and Redis
+                            </p>
+                        </div>
+                    </section>
                 </div>
 
-                <div class="field">
-                    <div class="control">
-                        <input class="input" type="text" placeholder="Message" id="chat-message-input">
+                <div class="column is-6 is-offset-3">
+                    <div class="box">
+                        <div id="chat-messages" style="max-height: 300px; overflow-y: scroll;">
+                            {% for m in messages %}
+                                {% if m.username == username %}
+                                    <div class="communication me">
+                                        <span><b>{{ m.username }}</b>: {{ m.content }}<br></span>
+                                    </div>
+                                {% else %}
+                                    <div class="communication friend">
+                                        <span style="float: right"><b>{{ m.username }}</b>: {{ m.content }}<br></span>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="typing">
+                            <p class="sender"></p>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="field">
-                    <div class="control">
+                    <div class="field">
+                        <div class="control">
+                            <input onkeyup="sendTypingSignal()" class="input" type="text" placeholder="Message"
+                                   id="chat-message-input">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="control">
 
                             <button class="button is-info" id="chat-message-submit">Submit</button>
 
+                        </div>
                     </div>
-                </div>
 
-                <small class="has-text-grey-light">Your username: {{ username }}</small>
+                    <small class="has-text-grey-light">Your username: {{ username }}</small>
+                </div>
             </div>
+
         </div>
-    </div>
-</section>
+    </section>
 </form>
 {{ room_name|json_script:"json-roomname" }}
 {{ username|json_script:"json-username" }}
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+{% endif %}
+
 
 <script>
 
@@ -201,17 +288,29 @@
         console.log('onmessage');
         $('.communication').removeClass('new')
         const data = JSON.parse(e.data);
-        var message = ''
-        if (data.message) {
-            if (data.username == '{{ username }}') {
-                message = ('<div class="communication me new"><span><b>' + data.username + '</b>: ' + data.message + '<br></span></div')
-            } else {
-                message = ('<div class="communication friend new"><span><b>' + data.username + '</b>: ' + data.message + '<br></span></div')
+        if (data.action === 'typing') {
+            //show typing indicator
+            if (data.username !== userName){
+                $('.sender').text(data.username + ' is typing')
+                $('.typing').addClass('show_typing')
             }
-            document.querySelector('#chat-messages').innerHTML += message;
-        } else {
-            alert('The message is empty!');
+        }else if(data.action === 'un_typing'){
+            if (data.username !== userName){
+                $('.typing').removeClass('show_typing')
+            }
         }
+        else if (data.action === 'send') {
+            var message = ''
+            if (data.message) {
+                if (data.username === '{{ username }}') {
+                    message = ('<div class="communication me new"><span><b>' + data.username + '</b>: ' + data.message + '<br></span></div')
+                } else {
+                    message = ('<div class="communication friend new"><span><b>' + data.username + '</b>: ' + data.message + '<br></span></div')
+                }
+                document.querySelector('#chat-messages').innerHTML += message;
+            }
+        }
+
 
         scrollToBottom();
     };
@@ -220,11 +319,31 @@
         console.log('The socket close unexpectadly');
     };
 
+    function sendTypingSignal() {
+        if($('#chat-message-input').val() != ''){
+            chatSocket.send(JSON.stringify({
+                'action': 'typing',
+                'username': userName,
+                'message': '',
+                'room': roomName
+            }));
+        }else{
+            chatSocket.send(JSON.stringify({
+                'action': 'un_typing',
+                'username': userName,
+                'message': '',
+                'room': roomName
+            }));
+        }
+
+    }
+
     function sendMessage() {
         const messageInputDom = document.querySelector('#chat-message-input');
         const message = messageInputDom.value;
 
         chatSocket.send(JSON.stringify({
+            'action': 'send',
             'message': message,
             'username': userName,
             'room': roomName

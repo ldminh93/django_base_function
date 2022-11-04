@@ -14,5 +14,6 @@ RUN pip3 install channels_redis
 RUN pip3 install python-social-auth
 RUN pip3 install social-auth-app-django
 COPY . ./
+RUN pip3 install -r requirements.txt
 RUN chmod 777 migrate_index.sh
 #ENTRYPOINT ["sh", "./migrate_index.sh"]

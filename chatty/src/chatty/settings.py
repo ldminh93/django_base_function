@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'chat',
     # 'rabbit',
-    # 'channels',
+    'channels',
     'blog',
     'home',
     # 'blockchain',
@@ -100,7 +100,8 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
+            # 'hosts': [('redis', 6379)],
+            'hosts': [('localhost', 6379)],
         }
     }
 }
@@ -214,7 +215,7 @@ AUTHENTICATION_BACKENDS = (
 )
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'chat/home/'
 
 SOCIAL_AUTH_FACEBOOK_KEY = '890293545703724'  # App ID
 SOCIAL_AUTH_FACEBOOK_SECRET = 'f250f2dde78fdc5c251f46dc26f64d96'  # App Secret

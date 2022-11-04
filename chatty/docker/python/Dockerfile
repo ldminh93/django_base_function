@@ -15,13 +15,14 @@ RUN pip3 install elasticsearch
 RUN pip3 install elasticsearch-dsl
 RUN pip3 install django-elasticsearch-dsl
 RUN pip3 install djangorestframework-simplejwt
-RUN pip3 install channels_redis
+RUN pip3 install channels-redis
 
 RUN pip install -U pip \
                    gunicorn
 RUN pip3 install social-auth-app-django
-COPY . ./
 
+COPY . ./
+RUN pip install -r requirements.txt
 
 #ENTRYPOINT ["sh", "migrate_index.sh"]
 

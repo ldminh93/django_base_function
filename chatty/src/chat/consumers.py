@@ -27,22 +27,48 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from web socket
     async def receive(self, text_data):
         data = json.loads(text_data)
+        action = data['action']
         message = data['message']
         username = data['username']
         room = data['room']
+        if action == 'send':
+            await self.save_message(username, room, message)
 
-        await self.save_message(username, room, message)
+            # Send message to room group
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message,
+                    'username': username
+                }
+            )
+        elif action == 'typing':
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'typing_signal',
+                    'action': action,
+                    'username': username
+                }
+            )
+        elif action == 'un_typing':
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'typing_signal',
+                    'action': action,
+                    'username': username
+                }
+            )
+    async def typing_signal(self, event):
+        action = event['action']
+        username = event['username']
+        await self.send(text_data=json.dumps({
+            'action': action,
+            'username': username
+        }))
 
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-                'username': username
-            }
-        )
-    
     # Receive message from room group
     async def chat_message(self, event):
         message = event['message']

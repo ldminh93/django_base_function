@@ -13,31 +13,28 @@ services:
       && gunicorn --bind 0.0.0.0:8000 chatty.wsgi"
     expose:
       - "8000"
-    ports:
-      - "8000:8000"
 #    depends_on:
-#      - db
+##      - db
 #      - redis
-#    networks:
-#      - es-net
-  db:
-    image: postgres:11.0-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=user
-    ports:
-      - "5432:5432"
+    networks:
+      - es-net
+    restart: always
+#  db:
+#    image: postgres:11.0-alpine
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data/
+#    environment:
+#      - POSTGRES_USER=user
+#      - POSTGRES_PASSWORD=user
+#    ports:
+#      - "5432:5432"
   nginx:
     build: ./docker/nginx
     volumes:
       - static_volume:/home/app/microservice/static
     ports:
-      - "80:8000"
+      - "80:80"
     depends_on:
-      - web
-    links:
       - web
     networks:
       - es-net
@@ -53,16 +50,19 @@ services:
 #      - es-net
 #    ports:
 #      - 9200:9200
-#  redis:
-#    container_name: redis
-#    restart: always
-#    image: redis:5
-#    networks:
-#      - es-net
-#    ports:
-#      - "6379:6379"
+  redis:
+    hostname: redis
+    container_name: redis
+    restart: always
+    image: redis:5
+    networks:
+      - es-net
+#    healthcheck:
+#      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    ports:
+      - "6379:6379"
 volumes:
-  postgres_data:
+#  postgres_data:
   static_volume:
 networks:
   es-net:
